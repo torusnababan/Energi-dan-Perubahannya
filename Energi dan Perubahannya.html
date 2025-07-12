@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis IPA: Energi dan Perubahannya</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+            position: relative;
+        }
+        .header-main-title {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        h1 {
+            color: #0056b3;
+            margin: 0;
+            font-size: 2.2em;
+        }
+        .author-info {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .author-info p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #555;
+        }
+        .author-info p:first-child {
+            font-weight: bold;
+            color: #333;
+            font-size: 1em;
+        }
+        .header-image {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #0056b3;
+            z-index: 10;
+        }
+        .left-header-image {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #0056b3;
+            z-index: 10;
+        }
+        h2 {
+            color: #0056b3;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], select {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .question {
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .question p {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #d9534f;
+            margin-bottom: 15px;
+            text-align: right;
+        }
+        #timeLimitDisplay {
+            text-align: right;
+            font-weight: bold;
+            margin-bottom: 5px;
+            margin-top: 50px;
+        }
+        #results {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #e9ecef;
+            display: none;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: red;
+            font-weight: bold;
+        }
+        .cooldown-message {
+            text-align: center;
+            font-size: 1.2em;
+            color: #d9534f;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #d9534f;
+            border-radius: 5px;
+            background-color: #ffe0e0;
+        }
+        @media (max-width: 600px) {
+            .header-image, .left-header-image {
+                position: static;
+                margin: 10px auto;
+                display: block;
+            }
+            .header-main-title, .author-info {
+                text-align: center;
+            }
+            .container {
+                position: static;
+            }
+            #timeLimitDisplay {
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-main-title">
+            <h1>Kuis IPA: Energi dan Perubahannya</h1>
+        </div>
+        <div class="author-info">
+            <p>By. Torus Manuntun Nababan, S.Pd.,M.Pd</p>
+            <p>(Pengembang Soal Kuis)</p>
+        </div>
+        <img src="logo.png" alt="Foto Torus Manuntun Nababan, S.Pd.,M.Pd" class="header-image">
+        <img src="jas.jpg" alt="Ilustrasi Jas" class="left-header-image">
+
+        <p id="timeLimitDisplay">Waktu pengerjaan: <span id="timeLimit">30</span> menit</p>
+        <div id="timer">Waktu tersisa: 30:00</div>
+
+        <form id="quizForm">
+            <h2>Identitas Siswa</h2>
+            <div class="form-group">
+                <label for="sekolah">Nama Sekolah:</label>
+                <input type="text" id="sekolah" name="sekolah" required>
+            </div>
+            <div class="form-group">
+                <label for="nama">Nama Siswa:</label>
+                <input type="text" id="nama" name="nama" required>
+            </div>
+            <div class="form-group">
+                <label for="kelas">Kelas:</label>
+                <input type="text" id="kelas" name="kelas" required>
+            </div>
+            <div class="form-group">
+                <label for="semester">Semester:</label>
+                <select id="semester" name="semester" required>
+                    <option value="">Pilih Semester</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tahunAjaran">Tahun Ajaran:</label>
+                <input type="text" id="tahunAjaran" name="tahunAjaran" placeholder="Contoh: 2024/2025" required>
+            </div>
+
+            <hr>
+
+            <h2>Soal Kuis</h2>
+            <div id="questionsContainer">
+                </div>
+
+            <button type="submit">Selesai Kuis</button>
+        </form>
+
+        <div id="results">
+            <h2>Hasil Kuis</h2>
+            <p><strong>Nama Siswa:</strong> <span id="resultNama"></span></p>
+            <p><strong>Skor Anda:</strong> <span id="score"></span></p>
+            <p id="message"></p>
+            <h3>Detail Jawaban:</h3>
+            <div id="answerDetails">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            // Wujud Zat: Padat, Cair, Gas (4 soal)
+            {
+                topic: "Wujud Zat",
+                question: "Es batu, pensil, dan meja memiliki bentuk tetap dan volume tetap. Ini adalah contoh dari wujud zat...",
+                options: ["Cair", "Padat", "Gas", "Plasma"],
+                answer: "Padat"
+            },
+            {
+                topic: "Wujud Zat",
+                question: "Air di dalam gelas dan minyak di dalam botol memiliki volume tetap tetapi bentuknya mengikuti wadah. Ini adalah contoh dari wujud zat...",
+                options: ["Cair", "Padat", "Gas", "Plasma"],
+                answer: "Cair"
+            },
+            {
+                topic: "Wujud Zat",
+                question: "Udara di dalam balon dan uap air memiliki bentuk dan volume yang berubah-ubah sesuai wadahnya. Ini adalah contoh dari wujud zat...",
+                options: ["Cair", "Padat", "Gas", "Plasma"],
+                answer: "Gas"
+            },
+            {
+                topic: "Wujud Zat",
+                question: "Zat yang partikelnya tersusun sangat rapat dan teratur adalah zat dalam wujud...",
+                options: ["Cair", "Padat", "Gas", "Plasma"],
+                answer: "Padat"
+            },
+
+            // Perubahan Antar Wujud (6 soal)
+            {
+                topic: "Perubahan Antar Wujud",
+                question: "Perubahan es batu menjadi air (dari padat ke cair) disebut...",
+                options: ["Membeku", "Mencair", "Menguap", "Mengembun"],
+                answer: "Mencair"
+            },
+            {
+                topic: "Perubahan Antar Wujud",
+                question: "Perubahan air menjadi es batu (dari cair ke padat) disebut...",
+                options: ["Mencair", "Membeku", "Menguap", "Mengembun"],
+                answer: "Membeku"
+            },
+            {
+                topic: "Perubahan Antar Wujud",
+                question: "Air yang dipanaskan sampai menjadi uap (dari cair ke gas) disebut...",
+                options: ["Membeku", "Mencair", "Menguap", "Mengembun"],
+                answer: "Menguap"
+            },
+            {
+                topic: "Perubahan Antar Wujud",
+                question: "Uap air di udara yang berubah menjadi titik-titik air di pagi hari (dari gas ke cair) disebut...",
+                options: ["Membeku", "Mencair", "Menguap", "Mengembun"],
+                answer: "Mengembun"
+            },
+            {
+                topic: "Perubahan Antar Wujud",
+                question: "Kapur barus yang lama-lama habis di lemari (dari padat ke gas) disebut...",
+                options: ["Membeku", "Mencair", "Menyublim", "Mengembun"],
+                answer: "Menyublim"
+            },
+            {
+                topic: "Perubahan Antar Wujud",
+                question: "Perubahan wujud yang memerlukan panas (kalor) adalah...",
+                options: ["Membeku dan Mengembun", "Mencair dan Menguap", "Membeku dan Menguap", "Mengembun dan Menyublim"],
+                answer: "Mencair dan Menguap"
+            },
+
+            // Perpindahan Kalor: Konduksi, Konveksi, Radiasi (6 soal)
+            {
+                topic: "Kalor dan Perpindahannya",
+                question: "Perpindahan panas melalui zat padat tanpa disertai perpindahan partikel zatnya disebut...",
+                options: ["Konveksi", "Radiasi", "Konduksi", "Evaporasi"],
+                answer: "Konduksi"
+            },
+            {
+                topic: "Kalor dan Perpindahannya",
+                question: "Jika kamu memegang ujung sendok logam yang lain ujungnya diletakkan di air panas, tanganmu akan terasa panas. Ini adalah contoh perpindahan panas secara...",
+                options: ["Konduksi", "Konveksi", "Radiasi", "Semua benar"],
+                answer: "Konduksi"
+            },
+            {
+                topic: "Kalor dan Perpindahannya",
+                question: "Perpindahan panas melalui aliran zat (cair atau gas) disertai perpindahan partikel zatnya disebut...",
+                options: ["Konduksi", "Konveksi", "Radiasi", "Sublimasi"],
+                answer: "Konveksi"
+            },
+            {
+                topic: "Kalor dan Perpindahannya",
+                question: "Air yang mendidih di panci, di mana air panas di bawah bergerak ke atas dan air dingin di atas turun ke bawah, adalah contoh...",
+                options: ["Konduksi", "Konveksi", "Radiasi", "Semua salah"],
+                answer: "Konveksi"
+            },
+            {
+                topic: "Kalor dan Perpindahannya",
+                question: "Perpindahan panas tanpa melalui medium (ruang hampa) disebut...",
+                options: ["Konduksi", "Konveksi", "Radiasi", "Absorpsi"],
+                answer: "Radiasi"
+            },
+            {
+                topic: "Kalor dan Perpindahannya",
+                question: "Ketika kamu berjemur di bawah sinar matahari, panas matahari sampai ke tubuhmu melalui cara...",
+                options: ["Konduksi", "Konveksi", "Radiasi", "Absorpsi"],
+                answer: "Radiasi"
+            },
+
+            // Kalor Jenis, Perubahan Suhu dan Wujud (4 soal)
+            {
+                topic: "Kalor Jenis",
+                question: "Kemampuan suatu zat untuk menyerap atau melepaskan panas (kalor) untuk menaikkan suhu zat tersebut sebesar 1°C disebut...",
+                options: ["Titik didih", "Kalor", "Kalor jenis", "Massa jenis"],
+                answer: "Kalor jenis"
+            },
+            {
+                topic: "Kalor Jenis",
+                question: "Air membutuhkan lebih banyak panas untuk naik suhunya dibandingkan logam. Ini berarti air memiliki...",
+                options: ["Kalor jenis yang rendah", "Kalor jenis yang tinggi", "Titik didih yang rendah", "Titik leleh yang tinggi"],
+                answer: "Kalor jenis yang tinggi"
+            },
+            {
+                topic: "Perubahan Suhu dan Wujud",
+                question: "Ketika es batu mencair menjadi air, suhu campuran es dan air akan...",
+                options: ["Naik terus", "Turun terus", "Tetap 0°C", "Berubah-ubah"],
+                answer: "Tetap 0°C"
+            },
+            {
+                topic: "Perubahan Suhu dan Wujud",
+                question: "Saat air mendidih pada tekanan normal, suhu air akan tetap 100°C meskipun terus dipanaskan. Pada saat ini, kalor digunakan untuk...",
+                options: ["Menaikkan suhu air", "Mengubah wujud air dari cair ke gas", "Menguapkan air", "Menurunkan suhu air"],
+                answer: "Mengubah wujud air dari cair ke gas"
+            }
+        ];
+
+        const timeLimitInMinutes = 30; 
+        let timeLeft = timeLimitInMinutes * 60; // seconds
+        let timerInterval;
+
+        const quizForm = document.getElementById('quizForm');
+        const questionsContainer = document.getElementById('questionsContainer');
+        const timerDisplay = document.getElementById('timer');
+        const resultsDiv = document.getElementById('results');
+        const resultNama = document.getElementById('resultNama');
+        const scoreDisplay = document.getElementById('score');
+        const messageDisplay = document.getElementById('message');
+        const answerDetailsDiv = document.getElementById('answerDetails');
+
+        // Durasi cooldown: 1 jam dalam milidetik
+        const cooldownDuration = 60 * 60 * 1000;
+        const lastQuizCompletionKey = 'lastQuizCompletionTime';
+
+        // Fungsi untuk mengacak array (algoritma Fisher-Yates)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Fungsi untuk menghasilkan dan menampilkan pertanyaan
+        function generateQuestions() {
+            // Pastikan jumlah soal adalah 20
+            if (questions.length !== 20) {
+                console.error("Jumlah soal tidak sesuai (harus 20).");
+            }
+            
+            shuffleArray(questions);
+            questionsContainer.innerHTML = '';
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+
+                const shuffledOptions = [...q.options];
+                shuffleArray(shuffledOptions);
+
+                questionDiv.innerHTML = `
+                    <p>${index + 1}. ${q.question}</p>
+                    <div class="options">
+                        ${shuffledOptions.map((option) => `
+                            <label>
+                                <input type="radio" name="q${index}" value="${option}"> ${option}
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                questionsContainer.appendChild(questionDiv);
+            });
+        }
+
+        // Fungsi untuk memulai timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `Waktu tersisa: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert("Waktu habis! Kuis akan otomatis disubmit.");
+                    quizForm.dispatchEvent(new Event('submit'));
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
+        // Penanganan saat formulir disubmit
+        quizForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            clearInterval(timerInterval);
+
+            let totalScore = 0;
+            const pointsPerCorrect = 5; // 5 poin per soal
+            const maxPossibleScore = questions.length * pointsPerCorrect; // 20 * 5 = 100
+
+            const answers = {};
+
+            questions.forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="q${index}"]:checked`);
+                const userAnswer = selectedOption ? selectedOption.value : null;
+                answers[`q${index}`] = userAnswer;
+
+                if (userAnswer === q.answer) {
+                    totalScore += pointsPerCorrect;
+                }
+            });
+
+            // Simpan waktu penyelesaian kuis ke Local Storage
+            localStorage.setItem(lastQuizCompletionKey, Date.now());
+
+            // Tampilkan hasil
+            resultNama.textContent = document.getElementById('nama').value;
+            scoreDisplay.textContent = `${totalScore} / ${maxPossibleScore}`;
+
+            // Tentukan pesan berdasarkan skor
+            // Nilai Pemenang ditentukan oleh skor >= 70
+            if (totalScore >= 70) { 
+                messageDisplay.textContent = "Selamat Anda Pemenang";
+                messageDisplay.style.color = "green";
+            } else {
+                messageDisplay.textContent = "Anda Belum Beruntung, Belajar Lagi Ya";
+                messageDisplay.style.color = "red";
+            }
+
+            // Tampilkan detail jawaban
+            answerDetailsDiv.innerHTML = '';
+            questions.forEach((q, index) => {
+                const userAnswer = answers[`q${index}`];
+                const detailDiv = document.createElement('p');
+                let answerStatusClass = '';
+                let userAnswerText = userAnswer !== null ? userAnswer : 'Tidak dijawab';
+
+                if (userAnswer === q.answer) {
+                    answerStatusClass = 'correct';
+                } else if (userAnswer !== null) {
+                    answerStatusClass = 'incorrect';
+                } else {
+                    answerStatusClass = '';
+                }
+
+                detailDiv.innerHTML = `
+                    <strong>${index + 1}. ${q.question}</strong><br>
+                    Jawaban Anda: <span class="${answerStatusClass}">
+                        ${userAnswerText}
+                    </span><br>
+                    Kunci Jawaban: <span class="correct">${q.answer}</span>
+                `;
+                answerDetailsDiv.appendChild(detailDiv);
+            });
+
+            quizForm.style.display = 'none';
+            resultsDiv.style.display = 'block';
+        });
+
+        // Inisialisasi kuis dan cek cooldown saat halaman dimuat
+        window.onload = function() {
+            const lastCompletionTime = localStorage.getItem(lastQuizCompletionKey);
+            if (lastCompletionTime) {
+                const timeElapsed = Date.now() - parseInt(lastCompletionTime);
+                if (timeElapsed < cooldownDuration) {
+                    const remainingTime = cooldownDuration - timeElapsed;
+                    const minutes = Math.floor(remainingTime / (1000 * 60));
+                    const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+
+                    quizForm.style.display = 'none';
+                    timerDisplay.style.display = 'none';
+                    document.getElementById('timeLimitDisplay').style.display = 'none';
+                    const cooldownMessageDiv = document.createElement('div');
+                    cooldownMessageDiv.classList.add('cooldown-message');
+                    cooldownMessageDiv.innerHTML = `
+                        Anda telah menyelesaikan kuis ini. <br>
+                        Silakan coba lagi dalam **${minutes.toString().padStart(2, '0')} menit dan ${seconds.toString().padStart(2, '0')} detik**.
+                    `;
+                    document.querySelector('.container').insertBefore(cooldownMessageDiv, document.getElementById('quizForm'));
+                    return;
+                }
+            }
+            // Jika tidak ada cooldown atau cooldown sudah berakhir, inisialisasi kuis
+            generateQuestions();
+            startTimer();
+        };
+    </script>
+</body>
+</html>
